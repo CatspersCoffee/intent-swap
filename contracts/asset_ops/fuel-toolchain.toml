@@ -1,0 +1,6 @@
+[toolchain]
+channel = "testnet_fc37_s65_1"
+
+[components]
+forc = "0.65.1"
+fuel-core = "0.37.0"

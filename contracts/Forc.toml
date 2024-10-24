@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "asset_ops",
+  "predicate_validator",
+  "dummy_predicate_wallet",
+  "contract_validator"
+]
