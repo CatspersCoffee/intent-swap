@@ -1,0 +1,10 @@
+[project]
+authors = ["Antony <0xbadc0de@l3labs.org>"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "predicate_validator"
+
+[dependencies]
+intentswap_712_tools = { path = "../intentswap_712_tools" }
+helpers = { path = "../helpers" }
+

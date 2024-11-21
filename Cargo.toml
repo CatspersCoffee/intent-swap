@@ -1,0 +1,37 @@
+[package]
+name = "intent-swap"
+authors = ["Antony <0xbadc0de@l3labs.org>"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+# For fuel-core version 0.40.0:
+fuel-types = "0.58.2"
+fuel-vm = "0.58.2"
+fuel-tx = { version = "0.58.2" }
+fuel-core = { version = "0.40.0", default-features = false }
+# fuel-core-interfaces = "0.15.3"
+fuels = { version = "0.66.9", features = ["fuel-core-lib"] }
+fuel-crypto = "0.58.2"
+
+
+ethers = { version = "2.0", features = ["rustls"] }
+ethers-signers = "2.0"
+ethers-core = "2.0.1"
+ethers-contract-derive = "2.0.14"
+
+tokio = { version = "1.12", features = ["rt", "macros"] }
+dotenv = "0.15.0"
+rand = "0.8.5"
+reqwest = "0.11.13"
+hex = "0.4.3"
+sha2 = { version = "0.10", default-features = false }
+serde_json = "1.0.91"
+serde = { version = "1.0.188", features = ["derive"] }
+clap = { version = "4.3.1", features = ["derive", "cargo"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+indicatif = "0.17.8"
+thiserror = "1.0"
+
