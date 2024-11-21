@@ -59,7 +59,7 @@ use intentswap_712_tools::{
         check_utxos,
         find_input_assets_owner,
         verify_change_output,
-        reconstruct_intent, ReconstructIntentResult,
+        reconstruct_intent_lite, ReconstructIntentResult,
     },
 };
 
@@ -144,7 +144,8 @@ fn main( intent: Intent ) -> bool {
             result
         },
         Err(error_code) => {
-            revert(error_code);
+            // revert(error_code);
+            return false;
         },
     };
     let output_result = match process_assets(
@@ -161,7 +162,8 @@ fn main( intent: Intent ) -> bool {
         },
         Err(error_code) => {
             // Output processing failed with error code
-            revert(error_code);
+            // revert(error_code);
+            return false;
         },
     };
     // check utxos are ok
@@ -176,41 +178,50 @@ fn main( intent: Intent ) -> bool {
     match find_input_assets_owner(tx_inputs, input_result.match_asset) {
         Some(owner) => {
             sender = owner.into(); //returned as Option<Address>
+
+            // see Note 1 below.
+            /*
             change_ok = verify_change_output( // use v4
                 tx_change_assetid,
                 tx_change_to,
                 input_result.match_asset,
                 sender,
             );
+            */
         },
         None => {
-            sender = b256::zero();
+            return false;
         },
     }
-/*
+
+    //-------------------------------------------
+
     if (input_result.amounts_match &&
         output_result.amounts_match &&
         utxo_check_result &&
         change_ok
         ) {
 
-        match reconstruct_intent(
+        // Note 1:
+        // The predicate validator has run into max bytecode length issues, so for
+        // demonstraction we are simply reconstructing the intent from mostly the
+        // data passed in using reconstruct_intent_lite(). We only use the tx_inputs
+        // as tx specific data here. See the contract validator and reconstruct_intent()
+        // for true reconstruction mechanism, that takes all (* see Note 2 below) the data obtained from
+        // transaction introspection.
+        //
+        match reconstruct_intent_lite(
             tx_inputs,
             input_result.agg_assets,
-            input_result.agg_amounts,
-            output_result.agg_assets,
-            output_result.agg_amounts,
-            input_result.match_asset,   // in match
-            input_result.match_count,   // number of matches
-            output_result.match_asset,  // out match
-            output_result.match_count,  // number of matches
-            input_result.all_same_type, // all input matches are of the same type
+            intent.io.inputamounts,
+            intent.io.outputasset,
+            intent.io.outputamount,
             ordered_utxos,
             utxo_indices,
 
         ) {
             ReconstructIntentResult::Success(recon_intent) => {
-
+                // Note 2:
                 // Use the reconstructed intent data to rebuild the struct.
                 // Copy the tolerance directly from sent in intent data, if this
                 // value was sent in with a value that was not the same as the sender
@@ -228,7 +239,7 @@ fn main( intent: Intent ) -> bool {
                 );
                 let encoded_hash = match payload.encode_eip712() {
                     Some(hash) => hash,
-                    None => revert(0),
+                    None => { return false; },
                 };
 
                 let mut ptr: u64 = 0;
@@ -239,32 +250,25 @@ fn main( intent: Intent ) -> bool {
                 recovered_signer = ec_recover_evm_address(
                     compactsig, encoded_hash
                 ).unwrap().into();
-
             },
-            ReconstructIntentResult::Fail(error_code) => {
+            _ => {
                 // Failed to reconstruct intent
             }
         }
+
     } else {
         // input or outputs or utxos are not correct
-        if !input_result.amounts_match {    // revert code for input failure
-            revert(6662);
-        } else if !output_result.amounts_match {    // revert code for output failure
-            revert(6663);
-        } else if !utxo_check_result {    // revert code for utxo failure
-            revert(6664);
-        } else if !change_ok {    // revert code for change failure
-            revert(6665);
-        }
-
+        // revert code for input failure
+        // revert code for output failure
+        // revert code for utxo failure
+        // revert code for change failure
+        return false;
     }
 
 
     if (recovered_signer == TEST_CONST_EVM_SINGER) {
         signed_by_sender = true;
-    } else {
-        revert(6661);
     }
-*/
+
     return signed_by_sender;
 }

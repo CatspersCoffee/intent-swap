@@ -161,7 +161,7 @@ pub fn hash_bytes(payloadbytes: Bytes) -> b256 {
 /// and the new pointer value.
 pub fn bytes_read_b256(data: Bytes, ptr: u64, num_bytes: u64) -> (b256, u64) {
     if num_bytes > 32 {
-        revert(0);
+        return (b256::zero(), ptr);
     }
     if num_bytes == 0 {
         return (b256::zero(), ptr);

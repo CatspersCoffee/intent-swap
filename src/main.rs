@@ -40,17 +40,9 @@ pub mod consts;
 
 #[tokio::main]
 async fn main() {
-    println!("sdfsdfdsf");
-
-    // let rt = tokio::runtime::Runtime::new().unwrap();
-    // rt.block_on(async {
-    //     let _f = run_basic().await;
-    // });
-
-    // let _f = run_basic().await;
+    println!("Run swap with contract validator.");
 
     let _f = run_contract_validated_intent_swap().await;
-
 
 }
 
@@ -63,7 +55,7 @@ async fn run_contract_validated_intent_swap() {
     let eth_address = get_evm_addr();
     println!("EVM SENDER ADDRESS: 0x{}", hex::encode(eth_address));
 
-
+    // setup assets from blank slate.
     let (
         provider,
         giov_cid,
@@ -85,15 +77,15 @@ async fn run_contract_validated_intent_swap() {
 
     //-------------------------------------------------------------------------
 
-    // let amount_in_1_decimal: u64 = 1_000_000_000; // 1 ETH, as U256 on Fuel, 9 decimals.
-    // let amount_in_2_decimal: u64 = 520_000_000; // 0.52 ETH, as U256 on Fuel, 9 decimals.
+    let amount_in_1_decimal: u64 = 1_000_000_000; // 1 ETH, as U256 on Fuel, 9 decimals.
+    let amount_in_2_decimal: u64 = 520_000_000; // 0.52 ETH, as U256 on Fuel, 9 decimals.
 
-    let amount_in_1_decimal: u64 = 600_000_000; // 1 ETH, as U256 on Fuel, 9 decimals.
-    let amount_in_2_decimal: u64 = 400_000_000; // 0.52 ETH, as U256 on Fuel, 9 decimals.
+    // let amount_in_1_decimal: u64 = 600_000_000; // 1 ETH, as U256 on Fuel, 9 decimals.
+    // let amount_in_2_decimal: u64 = 400_000_000; // 0.52 ETH, as U256 on Fuel, 9 decimals.
 
 
 
-    let amount_out_decimal: u64 = 2_000_000_000; // 2x, make the price 0.76 ETH per
+    let amount_out_decimal: u64 = 2_000_000_000; // 2x, make the price 0.50 ETH per
     // let amount_out_decimal: u64 = 1_940_000_000; // 2x, make the price 0.76 ETH per
 
     let amount_to_sender = amount_out_decimal;

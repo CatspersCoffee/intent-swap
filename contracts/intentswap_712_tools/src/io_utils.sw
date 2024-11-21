@@ -813,6 +813,57 @@ pub fn reconstruct_intent(
     ReconstructIntentResult::Success(intent)
 }
 
+/// This is a "lite" version of the above, for the predicate validator.
+/// The predicate validator has run into max bytecode length, so we are
+/// simply reconstructing the intent with only the tx_inputs.
+pub fn reconstruct_intent_lite(
+    tx_inputs: Vec<InpOut>,
+    agg_input_assets: [b256; 3],
+    input_amounts: [b256; 5],
+    output_asset: b256,
+    output_amount: b256,
+    ordered_utxos: [b256; 5],
+    utxo_indices: [u64; 5],
+) -> ReconstructIntentResult {
+
+    let mut intent = ReconstructedIntent {
+        input_assets: [b256::zero(); 5],
+        input_amounts: input_amounts,
+        input_utxos: ordered_utxos,
+        output_asset: output_asset,
+        output_amount: output_amount,
+    };
+
+
+    let mut i = 0;
+
+    while i < 5 {
+        // Skip zero UTXOs
+        if ordered_utxos[i] == b256::zero() {
+            i += 1;
+            continue;
+        }
+
+        // Get the index in tx_inputs
+        let tx_index = utxo_indices[i];
+
+        // Get the input at this index
+        let input = tx_inputs.get(tx_index).unwrap();
+
+        // Set asset and amount in the same order as UTXOs
+        intent.input_assets[i] = input.assetid;
+
+        i += 1;
+    }
+
+    ReconstructIntentResult::Success(intent)
+}
+
+
+
+
+
+
 
 // Helper function to check if an array of 5 elements contains a value
 fn contains_val_5(array: [b256; 5], value: b256) -> bool {
