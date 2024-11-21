@@ -1,4 +1,4 @@
-use rand::prelude::Rng;
+// use rand::prelude::Rng;
 use thiserror::Error;
 use std::result::Result as StdResult;
 use fuels::{
@@ -27,9 +27,6 @@ pub enum GenIOError {
 /// interfaces to SwapVerifier verifier Contract
 pub mod generalized_swap_verifier_interface {
     use super::*;
-    // use fuels::programs::responses::CallResponse;
-    // use std::env;
-    use rand::prelude::Rng;
 
     pub const VERIFIER_CONTRACT_BINARY_PATH: &str = "./contracts/contract_validator/out/debug/contract_validator.bin";
     pub const VERIFIER_CONTRACT_STORAGE_PATH: &str = "./contracts/contract_validator/out/debug/contract_validator-storage_slots.json";
@@ -52,7 +49,7 @@ pub mod generalized_swap_verifier_interface {
     ) -> (SwapVerifier<WalletUnlocked>, ContractId) {
 
         // deploy with salt:
-        let mut rng = rand::thread_rng();
+        // let mut rng = rand::thread_rng();
         // let salt = rng.gen::<[u8; 32]>();
         let salt: [u8; 32] = [01u8; 32];
         println!("SwapVerifier salt: {}", hex::encode(salt));
@@ -177,7 +174,7 @@ pub mod generalized_swap_verifier_interface {
 
 
 /*
-pub mod dummy_p712validator {
+pub mod predicate_validator {
     use super::*;
 
     pub const PREDICATE_VALIDATOR_BINARY_PATH: &str = "./contracts/predicate_validator/out/debug/predicate_validator.bin";
@@ -189,7 +186,7 @@ pub mod dummy_p712validator {
         ),
     );
 
-    pub fn get_dummyp712validator_data(
+    pub fn get_predicate_validator_data(
         sender: Bits256,
         signature_bytes: Vec<u8>,
         asset_in: Bits256,
@@ -201,24 +198,24 @@ pub mod dummy_p712validator {
 
         let mut encoded_bytes: Vec<u8> = Vec::new();
         encoded_bytes.push(0x00);
-        let predicate_data = DummyP712ValidatorEncoder::default().encode_data(
+        let predicate_data = SimpleSwapPredicateValidatorEncoder::default().encode_data(
             Bytes(encoded_bytes),
         ).unwrap();
         predicate_data
     }
 
 
-    pub fn get_dummyp712validator_info(
+    pub fn get_predicate_validator_info(
         // configurable_byte: u8,
     ) -> (Vec<u8>, Bech32Address, Address) {
 
-        let dummyp712validator_bytecode = std::fs::read(PREDICATE_VALIDATOR_BINARY_PATH).unwrap();
-        let predicate = Predicate::from_code(dummyp712validator_bytecode.clone());
+        let predicate_validator_bytecode = std::fs::read(PREDICATE_VALIDATOR_BINARY_PATH).unwrap();
+        let predicate = Predicate::from_code(predicate_validator_bytecode.clone());
 
-        // let configurables = get_dummypwallet_configurables(
+        // let configurables = get_predicate_validator_configurables(
         //     configurable_byte,
         // );
-        // let predicate = Predicate::from_code(dummypwallet_bytecode.clone())
+        // let predicate = Predicate::from_code(predicate_validator_bytecode.clone())
         //     .with_configurables(configurables);
 
         let predicate_b32addr = predicate.address().clone();
@@ -299,7 +296,7 @@ pub mod tokenminter {
     ) -> ContractId {
 
         // deploy with salt:
-        let mut rng = rand::thread_rng();
+        // let mut rng = rand::thread_rng();
         // let salt = rng.gen::<[u8; 32]>();
         let salt: [u8; 32] = [02u8; 32];
         println!("TokenMinter salt: {}", hex::encode(salt));
