@@ -32,24 +32,35 @@ pre-sign the spending of UTXOs from a assets locked at predicates owned by the u
 4. **Validation**: A smart contract or predicate verifies the transaction matches the user's original intent before execution.
 
    Step 1: Struct Data Matching
-   $$
-   \forall s \in S, \exists t \in T : s \equiv t
-   $$
+<div align="center">
+
+$$\forall s \in S, \exists t \in T : s \equiv t$$
+
+</div>
 
    Step 2: Transaction Details Validation
-   $$
-   \begin{align*}
-   H(T) &\equiv H(I) \\
-   Verify(Sig, H(T)) &= true
-   \end{align*}
-   $$
+
+<div align="center">
+
+$$
+\begin{align*}
+H(T) &\equiv H(I) \\
+Verify(Sig, H(T)) &= true
+\end{align*}
+$$
+
+ </div>
+
 
    The transaction is valid if and only if:
-   $$
-   (\text{Step 1 is true}) \land (\text{Step 2 is true})
-   $$
 
+<div align="center">
 
+$$
+(\text{Step 1 is true}) \land (\text{Step 2 is true})
+$$
+
+ </div>
 
 See brief [formal spec](spec/formal_definition.pdf)
 
