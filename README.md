@@ -5,7 +5,7 @@ A decentralized intent-based swap implementation in Sway. This project is a prod
 ## Overview
 
 Intent-Swap enables users to express trading intentions through signed messages, which are then executed by transaction builders. This architecture separates intent declaration from the building of the transaction, allowing for more flexible transaction desires to be expressed by users. The below mechanism allows users to effectively
-pre-sign the spending of UTXOs from a assets locked at predicates owned by the user.
+pre-sign the spending of UTXOs from assets locked at predicates owned by the user.
 
 ## How It Works
 
@@ -31,7 +31,9 @@ pre-sign the spending of UTXOs from a assets locked at predicates owned by the u
 
 4. **Validation**: A smart contract or predicate verifies the transaction matches the user's original intent before execution.
 
+
    Step 1: Struct Data Matching
+
 <div align="center">
 
 $$\forall s \in S, \exists t \in T : s \equiv t$$
@@ -111,16 +113,16 @@ pub struct GenIO {
 flowchart LR
     subgraph User["User Inputs"]
         direction TB
-        I1[Input Asset 1 + Amount 1 UTXO 1]
-        I2[Input Asset 2 + Amount 2 UTXO 2]
-        I3[Input Asset 3 + Amount 3 UTXO 3]
-        I4[Input Asset 4 + Amount 4 UTXO 4]
-        I5[Input Asset 5 + Amount 5 UTXO 5]
+        I1[Asset_A + Amount 1 UTXO 1]
+        I2[Asset_A + Amount 2 UTXO 2]
+        I3[Asset_A + Amount 3 UTXO 3]
+        I4[Asset_A + Amount 4 UTXO 4]
+        I5[Asset_A + Amount 5 UTXO 5]
     end
 
     subgraph Solver["Solver Inputs"]
         direction TB
-        S1[Solver Asset + Amount UTXO]
+        S1[Asset_B + Amount UTXO]
         G1[Gas Input]
     end
 
@@ -129,11 +131,15 @@ flowchart LR
         V["Validation\n(tolerance check)"]
     end
 
-    subgraph Outputs["Output Distribution"]
+    subgraph OutputUser["User Output"]
         direction TB
-        O1[User Output Asset\n + Output Amount]
-        O2[Solver Output Asset\n + Amount]
-        O3[Gas Change\n to Original Provider]
+        OB1[Asset_B + Amount +- tolerance]
+    end
+
+    subgraph OutputsSolver["Solver Outputs"]
+        direction TB
+        OB2[Asset_A + Amount]
+        OB3[Gas Change to Original Provider]
     end
 
     I1 --> V
@@ -143,15 +149,16 @@ flowchart LR
     I5 --> V
     S1 --> V
     G1 --> V
-    V --> O1
-    V --> O2
-    V --> O3
+    V --> OB1
+    V --> OB2
+    V --> OB3
 
     style User fill:#39773A,stroke:#4caf50
     style Solver fill:#9A5F13,stroke:#e24a4a
     style Swap fill:#762884,stroke:#9547A2
-    style Outputs fill:#0F466A,stroke:#0a90e2
-    style V fill:#C78DD1,stroke:#E0C7E6
+    style OutputUser fill:#39773A,stroke:#4caf50
+    style OutputsSolver fill:#9A5F13,stroke:#e24a4a
+    style V fill:#A277BC,stroke:#D2C2DC
 ```
 
 </div>
