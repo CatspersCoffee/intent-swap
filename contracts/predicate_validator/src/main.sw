@@ -60,6 +60,7 @@ use intentswap_712_tools::{
         find_input_assets_owner,
         verify_change_output,
         reconstruct_intent_lite, ReconstructIntentResult,
+        reconstruct_intent,
     },
 };
 
@@ -202,6 +203,62 @@ fn main( intent: Intent ) -> bool {
         change_ok
         ) {
 
+        match reconstruct_intent(
+            tx_inputs,
+            input_result.agg_assets,
+            input_result.agg_amounts,
+            output_result.agg_assets,
+            output_result.agg_amounts,
+            input_result.match_asset,   // in match
+            input_result.match_count,   // number of matches
+            output_result.match_asset,  // out match
+            output_result.match_count,  // number of matches
+            input_result.all_same_type, // all input matches are of the same type
+            ordered_utxos,
+            utxo_indices,
+
+        ) {
+            ReconstructIntentResult::Success(recon_intent) => {
+
+
+                // Use the reconstructed intent data to rebuild the struct.
+                // Copy the tolerance directly from sent in intent data, if this
+                // value was sent in with a value that was not the same as the sender
+                // set, then ecr will fail anyway.
+                let payload = (
+                    EIP712Domain::new(),
+                    GenIO::new(
+                        recon_intent.input_assets,
+                        recon_intent.input_utxos,
+                        recon_intent.input_amounts,
+                        recon_intent.output_asset,
+                        recon_intent.output_amount,
+                        intent.io.tolerance,
+                    )
+                );
+                let encoded_hash = match payload.encode_eip712() {
+                    Some(hash) => hash,
+                    None => revert(0),
+                };
+
+                let mut ptr: u64 = 0;
+                let (cs_lhs, ptr) = bytes_read_b256(intent.compsig, ptr, 32);
+                let (cs_rhs, ptr) = bytes_read_b256(intent.compsig, ptr, 32);
+                let compactsig = B512::from((cs_lhs, cs_rhs));
+
+                recovered_signer = ec_recover_evm_address(
+                    compactsig, encoded_hash
+                ).unwrap().into();
+
+            },
+            ReconstructIntentResult::Fail(error_code) => {
+
+            }
+        }
+
+
+
+        /*
         // Note 1:
         // The predicate validator has run into max bytecode length issues, so for
         // demonstraction we are simply reconstructing the intent from mostly the
@@ -255,6 +312,7 @@ fn main( intent: Intent ) -> bool {
                 // Failed to reconstruct intent
             }
         }
+        */
 
     } else {
         // input or outputs or utxos are not correct
