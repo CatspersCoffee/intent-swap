@@ -181,14 +181,14 @@ fn main( intent: Intent ) -> bool {
             sender = owner.into(); //returned as Option<Address>
 
             // see Note 1 below.
-            /*
+
             change_ok = verify_change_output( // use v4
                 tx_change_assetid,
                 tx_change_to,
                 input_result.match_asset,
                 sender,
             );
-            */
+
         },
         None => {
             return false;
@@ -255,8 +255,6 @@ fn main( intent: Intent ) -> bool {
 
             }
         }
-
-
 
         /*
         // Note 1:

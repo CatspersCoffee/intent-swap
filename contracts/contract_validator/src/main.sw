@@ -130,6 +130,7 @@ impl SwapVerifier for Contract {
         log(intent);
     }
 
+    /// Validate an intent by reconstruction of the original intent from transaction data.
     fn validate_solution(
         intent: Intent,
     ) -> bool {
@@ -145,7 +146,6 @@ impl SwapVerifier for Contract {
         let mut change_ok = false;
         let mut sender = b256::zero();
         let mut recovered_signer = b256::zero();
-        let mut signed_by_sender: bool = false;
 
         log(in_count);
         log(out_count);
@@ -198,7 +198,7 @@ impl SwapVerifier for Contract {
         }
 
         //-------------------------------------------- DEBUG:
-        /*
+
             log(String::from_ascii_str("Intent.io.inputassets:"));
             let mut k = 0;
             while k < 5 {
@@ -223,7 +223,7 @@ impl SwapVerifier for Contract {
             log(b256_to_hex(intent.io.outputamount));
             log(String::from_ascii_str("Intent.io.tolerance:"));
             log(intent.io.tolerance);
-        */
+
         //-------------------------------------------- DEBUG end.
 
         // copy tolerance from tx intent data:
@@ -248,9 +248,9 @@ impl SwapVerifier for Contract {
                 result
             },
             Err(error_code) => {
-                log("Input processing failed with error code:");
-                log(error_code);
-                revert(0);
+                // log("Input processing failed with error code:");
+                // log(error_code);
+                revert(error_code);
             },
         };
         let output_result = match process_assets(
@@ -269,7 +269,7 @@ impl SwapVerifier for Contract {
                 result
             },
             Err(error_code) => {
-                log("Output processing failed with error code:");
+                // log("Output processing failed with error code:");
                 revert(error_code);
             },
         };
@@ -279,6 +279,7 @@ impl SwapVerifier for Contract {
 
 
         //-------------------------------------------- DEBUG:
+
             if utxo_check_result {
                 log(String::from_ascii_str("Ordered UTXOs:"));
                 let mut i = 0;
@@ -311,6 +312,7 @@ impl SwapVerifier for Contract {
                 log(String::from_ascii_str("UTXOs  : FAIL"));
             }
             log(b256_to_hex(input_result.match_asset));
+
         //-------------------------------------------- DEBUG end.
 
 
@@ -337,6 +339,7 @@ impl SwapVerifier for Contract {
 
 
         //-------------------------------------------- DEBUG:
+
             log(String::from_ascii_str("Sender:"));
             log(b256_to_hex(sender));
             if change_ok {
@@ -344,6 +347,7 @@ impl SwapVerifier for Contract {
             } else {
                 log(String::from_ascii_str("Change : FAIL"));
             }
+
         //-------------------------------------------- DEBUG end.
 
 
@@ -433,7 +437,7 @@ impl SwapVerifier for Contract {
 
 
                     //-------------------------------------------- DEBUG:
-                    /*
+
                         log(String::from_ascii_str("CompSig (lhs:rhs):"));
                         log(b256_to_hex(cs_lhs));
                         log(b256_to_hex(cs_rhs));
@@ -443,7 +447,7 @@ impl SwapVerifier for Contract {
 
                         log(String::from_ascii_str("Recovered Signer:"));
                         log(b256_to_hex(recovered_signer));
-                    */
+
                     //-------------------------------------------- DEBUG end.
 
 
@@ -468,31 +472,35 @@ impl SwapVerifier for Contract {
             } else if !change_ok {    // revert code for change failure
                 revert(6665);
             }
+            // revert(7000);
 
         }
 
         //-------------------------------------------- DEBUG:
-            log(String::from_ascii_str("Recovered Signer:"));
-            log(b256_to_hex(recovered_signer));
+            // log(String::from_ascii_str("Recovered Signer:"));
+            // log(b256_to_hex(recovered_signer));
 
             // log(recovered_signer);   //NOTE - this gives compiler error
-            if (recovered_signer == TEST_CONST_EVM_SINGER) {
-                signed_by_sender = true;
-            } else {
-                revert(6661);
-            }
 
             // log(signed_by_sender);  //NOTE - uncommenting this here this result in a compiler error:
             // Too many arguments, cannot handle.: Immediate12TooLarge { val: 4525, span:
             // Span { src (ptr): 0x5626dfb00330, source_id: None, start: 0, end: 0, as_str(): "" } }
-            return signed_by_sender;
+
+            // let mut signed_by_sender = false;
+            // if (recovered_signer == TEST_CONST_EVM_SINGER) {
+            //     signed_by_sender = true;
+            // }
+
+            // return signed_by_sender;
         //-------------------------------------------- DEBUG end.
 
-        // if(recovered_signer == TEST_CONST_EVM_SINGER) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        if (recovered_signer == TEST_CONST_EVM_SINGER) {
+            return true;
+        } else {
+            revert(6661);
+        }
+        false
+
     }
 
 
