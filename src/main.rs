@@ -96,7 +96,8 @@ async fn run_contract_validated_intent_swap() {
 
     helpers::display::print_separator_line(170, "(INPUTS):"); //-------------------------------------------------------------------------
 
-    // get the asset_in 1st Input and UTXOid, (which will go to the Solver).
+    // get the asset_in 1st and 2nd Inputs and UTXOid's, (which will go to the Solver).
+    // i.e. aggregate enough asset_in to satisfy the Swap asset thats coming in.
     let dwal_asset_in_bal = io::tools::get_asset_balance_for_address(
         &provider,
         &predicate_owner_b32addr,
@@ -104,40 +105,6 @@ async fn run_contract_validated_intent_swap() {
     ).await;
     println!("DummyPWallet asset_in balance = {}", dwal_asset_in_bal);
 
-    /*
-    println!("get DummyPWallet asset_in 1st input");
-    let utxo_collector = UTXOllector::new();
-
-    let (dwal_asset_in_1_input, _, _) = utxo_collector.find_single_bytecode_predicate_input_for_amount(
-        &provider,
-        &predicate_owner_bytecode.clone(),
-        None,
-        *AssetId::from_bytes_ref(&asset_in_id),
-        amount_in_1_decimal,
-    ).await.unwrap();
-
-    let (asset_in_1_utxo_txid_bytes, utxo_1_txid_idx) = get_input_txid(&dwal_asset_in_1_input.clone()).unwrap();
-    println!("Asset In 1 UTXO ID:");
-    println!("utxo txid : {}", hex::encode(asset_in_1_utxo_txid_bytes));
-    println!("index     : {}", utxo_1_txid_idx);
-
-    // get the asset_in 2nd Input and UTXOid, (which will go to the Solver).
-    println!("get DummyPWallet asset_in 2nd input");
-    let utxo_collector = UTXOllector::new();
-
-    let (dwal_asset_in_2_input, _, _) = utxo_collector.find_single_bytecode_predicate_input_for_amount(
-        &provider,
-        &predicate_owner_bytecode.clone(),
-        None,
-        *AssetId::from_bytes_ref(&asset_in_id),
-        amount_in_2_decimal,
-    ).await.unwrap();
-
-    let (asset_in_2_utxo_txid_bytes, utxo_2_txid_idx) = get_input_txid(&dwal_asset_in_2_input.clone()).unwrap();
-    println!("Asset In 2 UTXO ID:");
-    println!("utxo txid : {}", hex::encode(asset_in_2_utxo_txid_bytes));
-    println!("index     : {}", utxo_2_txid_idx);
-    */
 
     println!("get DummyPWallet asset_in 1st, 2nd inputs:");
 
@@ -150,18 +117,6 @@ async fn run_contract_validated_intent_swap() {
     ).await.unwrap();
     let dwal_asset_in_1_input = dwal_asset_in_inputs.get(0).unwrap().to_owned();
     let dwal_asset_in_2_input = dwal_asset_in_inputs.get(1).unwrap().to_owned();
-
-    /*
-    let (asset_in_1_utxo_txid_bytes, utxo_1_txid_idx) = utxo_input_utils::get_input_txid(&dwal_asset_in_1_input.clone()).unwrap();
-    println!("Asset In 1 UTXO ID:");
-    println!("utxo txid : {}", hex::encode(asset_in_1_utxo_txid_bytes));
-    println!("index     : {}", utxo_1_txid_idx);
-
-    let (asset_in_2_utxo_txid_bytes, utxo_2_txid_idx) = utxo_input_utils::get_input_txid(&dwal_asset_in_2_input.clone()).unwrap();
-    println!("Asset In 2 UTXO ID:");
-    println!("utxo txid : {}", hex::encode(asset_in_2_utxo_txid_bytes));
-    println!("index     : {}", utxo_2_txid_idx);
-    */
 
     let (
         asset_in_1_utxo_txid_bytes,
@@ -185,10 +140,6 @@ async fn run_contract_validated_intent_swap() {
 
 
 
-
-
-
-
     // get the gas input for the solver, who pays the gas.
     println!("get DummyPSolver gas input:");
     let dsolver_baseasset_bal = io::tools::get_asset_balance_for_address(
@@ -206,7 +157,7 @@ async fn run_contract_validated_intent_swap() {
         100000u64,
     ).await.unwrap();
 
-    // get the asset_out asset id, from the the solver (which will do to the swapper pwallet)
+    // get the asset_out asset id, from the the solver (which will do to the swapper predicate wallet)
     println!("get DummyPSolver asset_out input:");
     let dsolver_asset_out_bal = io::tools::get_asset_balance_for_address(
         &provider,
